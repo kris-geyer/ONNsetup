@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ONN2</string>
+    <string name="training_started">Starting training</string>
+    <string name="training_not_underway">Training is not happening currently</string>
+</resources>
