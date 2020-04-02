@@ -1,4 +1,4 @@
-package geyer.sensorlab.onn2.models;
+package geyer.sensorlab.onn2.models.neurons;
 
 
 import geyer.sensorlab.onn2.constants.NeuronConstants;
@@ -9,12 +9,14 @@ public abstract class Neuron implements NeuronBehaviour {
     public final int id;
     public int resources = 20;
     public final String type;
-    private final int costOfBroadcast;
+    public final int costOfBroadcast;
+    private final int target;
 
-    Neuron (String neuronType){
+    Neuron (String neuronType, int target){
         id = neuronNum;
         this.type = neuronType;
         neuronNum++;
+        this.target = target;
 
         if(neuronType.equals(NeuronConstants.unipolar_neuron)){
             costOfBroadcast = NeuronConstants.unipolar_efficiency;

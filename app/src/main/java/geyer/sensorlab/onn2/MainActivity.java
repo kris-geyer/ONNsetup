@@ -10,12 +10,12 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import geyer.sensorlab.onn2.models.Neuron;
+import geyer.sensorlab.onn2.models.neurons.Neuron;
 import geyer.sensorlab.onn2.viewmodels.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView tvData, tvResult;
+    TextView tvData, tvResult, tvPrice;
     private MainActivityViewModel mainActivityViewModel;
 
     @Override
@@ -24,11 +24,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initializeUI();
         initializeViewModel();
+        retrievePrice();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
     }
 
     private void initializeUI() {
         tvData = findViewById(R.id.tvData);
         tvResult = findViewById(R.id.tvOutput);
+        tvPrice = findViewById(R.id.tvPrice);
         findViewById(R.id.btnStart).setOnClickListener(this);
     }
 
@@ -72,5 +80,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+
+        mainActivityViewModel.getPrice().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                tvPrice.setText("Price: £" + s);
+            }
+        });
+    }
+
+    private void retrievePrice() {
+        mainActivityViewModel.retrieveBitCoinPrice();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mainActivityViewModel.stopDetectingPrice();
     }
 }

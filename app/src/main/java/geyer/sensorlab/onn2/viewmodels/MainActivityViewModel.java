@@ -8,19 +8,24 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import geyer.sensorlab.onn2.models.AsyncResult;
-import geyer.sensorlab.onn2.models.Neuron;
-import geyer.sensorlab.onn2.models.Training;
+
+import geyer.sensorlab.onn2.models.bitCoin.BitCoinResponseListener;
+import geyer.sensorlab.onn2.models.neurons.TrainingResult;
+import geyer.sensorlab.onn2.models.neurons.Neuron;
+import geyer.sensorlab.onn2.models.neurons.Training;
 import geyer.sensorlab.onn2.repositories.NeuronRepository;
 
-public class MainActivityViewModel extends ViewModel implements AsyncResult {
+public class MainActivityViewModel extends ViewModel implements TrainingResult, BitCoinResponseListener {
 
     private MutableLiveData<List<Neuron>> neurons;
     private NeuronRepository neuronRepository;
     private MutableLiveData<Boolean> isUpdating = new MutableLiveData<>();
+    private MutableLiveData<String> bitCoinPrice = new MutableLiveData<>();
     private static String TAG = "MainActivityVM";
+    private static boolean requestPrice = true;
 
     public void init() {
+        requestPrice = true;
         if(neurons != null){
             return;
         }
@@ -28,6 +33,7 @@ public class MainActivityViewModel extends ViewModel implements AsyncResult {
 
         neuronRepository = NeuronRepository.getInstance();
         neurons = neuronRepository.getNeurons();
+
     }
 
 
@@ -47,6 +53,10 @@ public class MainActivityViewModel extends ViewModel implements AsyncResult {
         return isUpdating;
     }
 
+    public LiveData<String> getPrice() {
+        return bitCoinPrice;
+    }
+
     @Override
     public void processFinished(List<Neuron> neurons) {
 
@@ -58,5 +68,30 @@ public class MainActivityViewModel extends ViewModel implements AsyncResult {
 
         this.neurons.postValue(neurons);
         Log.i(TAG, "async finished");
+    }
+
+    public void retrieveBitCoinPrice() {
+        neuronRepository.retrievePrice(this);
+    }
+
+
+    @Override
+    public void onPriceRetrieved(String price) {
+        Log.i(TAG, "OnPriceRetrieved - Price: " + price);
+        bitCoinPrice.postValue(price);
+        if(requestPrice){
+            retrieveBitCoinPrice();
+        }
+    }
+
+    @Override
+    public void onFailureToRetrievePrice() {
+        Log.i(TAG, "onFailureToRetrievePrice");
+    }
+
+
+    public void stopDetectingPrice() {
+        requestPrice=false;
+        neuronRepository.stopPriceQuery();
     }
 }

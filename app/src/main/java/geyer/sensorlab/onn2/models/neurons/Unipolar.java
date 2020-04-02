@@ -1,4 +1,4 @@
-package geyer.sensorlab.onn2.models;
+package geyer.sensorlab.onn2.models.neurons;
 
 import android.util.Log;
 
@@ -7,29 +7,38 @@ import geyer.sensorlab.onn2.constants.NeuronConstants;
 public class Unipolar extends Neuron {
 
     private static String TAG = "Unipolar";
+    private final int target;
 
-    public Unipolar() {
-        super(NeuronConstants.unipolar_neuron);
+    public Unipolar(int target) {
+        super(NeuronConstants.unipolar_neuron, target);
+        this.target = target;
     }
 
     @Override
-    public void receiveSignal() {
-        sendOutput();
-    }
+    public int receiveSignal() {
 
+        if(sendOutput()){
+            return target;
+        }else{
+            return 0;
+        }
+    }
     @Override
     public void cognize() {
 
     }
 
     @Override
-    public void sendOutput() {
+    public boolean sendOutput() {
         if(!super.haveSufficientResources()){
             Log.i(TAG, "insufficient resources");
-            return;
+            return false;
         }
         super.expendResources();
         //here send the signal onwards
         Log.i(TAG, "Signal sent");
+        return true;
     }
+
+
 }

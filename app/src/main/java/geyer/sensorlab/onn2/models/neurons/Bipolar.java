@@ -1,4 +1,4 @@
-package geyer.sensorlab.onn2.models;
+package geyer.sensorlab.onn2.models.neurons;
 
 import android.util.Log;
 
@@ -6,14 +6,21 @@ import geyer.sensorlab.onn2.constants.NeuronConstants;
 
 public class Bipolar extends Neuron {
     private static String TAG = "Bipolar";
+    private final int target;
 
-    public Bipolar() {
-        super(NeuronConstants.bipolar_neuron);
+    public Bipolar(int target) {
+        super(NeuronConstants.bipolar_neuron, target);
+        this.target = target;
     }
 
     @Override
-    public void receiveSignal() {
-        sendOutput();
+    public int receiveSignal() {
+
+        if(sendOutput()){
+            return target;
+        }else{
+            return 0;
+        }
     }
 
     @Override
@@ -22,13 +29,16 @@ public class Bipolar extends Neuron {
     }
 
     @Override
-    public void sendOutput() {
+    public boolean sendOutput() {
         if(!super.haveSufficientResources()){
             Log.i(TAG, "insufficient resources");
-            return;
+            return false;
         }
         super.expendResources();
         //here send the signal onwards
         Log.i(TAG, "signal sent");
+        return true;
     }
+
+
 }
